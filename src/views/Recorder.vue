@@ -46,6 +46,25 @@
       </el-timeline>
     </el-card>
 
+    <!-- 回放起始步骤选择 -->
+    <div v-if="steps.length > 1" class="start-step-section">
+      <el-form :model="replayForm" inline>
+        <el-form-item label="回放起始步骤">
+          <el-select v-model="replayForm.startFromStep" style="width: 320px;">
+            <el-option
+              v-for="(step, i) in steps"
+              :key="i"
+              :label="`从第 ${i + 1} 步开始: ${step.text || step.action}`"
+              :value="i"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div style="color:#999;font-size:12px;margin-top:-8px;">
+        回放时会跳过起始步骤之前的所有步骤（如登录操作），因为 Cookie 已保存登录状态
+      </div>
+    </div>
+
     <!-- 保存 -->
     <div v-if="steps.length > 0" class="save-section">
       <el-form :model="scheduleForm" inline>
@@ -67,6 +86,7 @@ import { startRecording, stopRecording, createTask, getRecordingStatus } from '.
 const router = useRouter()
 const form = reactive({ name: '', url: '' })
 const scheduleForm = reactive({ time: '08:00' })
+const replayForm = reactive({ startFromStep: 0 })
 const recording = ref(false)
 const starting = ref(false)
 const stopping = ref(false)
@@ -156,6 +176,10 @@ const saveConfig = async () => {
       },
       verify: { success: ['签到成功', '已签到'], fail: ['请先登录'] }
     }
+    // 设置回放起始步骤
+    if (replayForm.startFromStep > 0) {
+      config.checkin.start_from_step = replayForm.startFromStep
+    }
     await createTask({
       name: form.name,
       url: form.url,
@@ -178,5 +202,6 @@ const saveConfig = async () => {
 .step-item { display: flex; align-items: center; gap: 10px; }
 .step-selector { color: #409eff; font-size: 13px; background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
 .step-text { color: #666; font-size: 13px; }
+.start-step-section { margin-top: 20px; padding: 16px; background: #f9f9f9; border-radius: 8px; }
 .save-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; }
 </style>

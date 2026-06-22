@@ -18,6 +18,22 @@
         <el-time-picker v-model="config.schedule" format="HH:mm" value-format="HH:mm" />
       </el-form-item>
 
+      <el-divider content-position="left">回放设置</el-divider>
+
+      <el-form-item label="起始步骤">
+        <el-select v-model="config.checkin.start_from_step" placeholder="从第1步开始（默认）">
+          <el-option
+            v-for="(step, index) in config.checkin.steps"
+            :key="index"
+            :label="`从第 ${index + 1} 步开始: ${step.name || '未命名'}`"
+            :value="index"
+          />
+        </el-select>
+        <div style="color:#999;font-size:12px;margin-top:4px;">
+          回放时会跳过起始步骤之前的所有步骤（通常是登录操作），因为 Cookie 已保存登录状态
+        </div>
+      </el-form-item>
+
       <el-divider content-position="left">签到步骤</el-divider>
 
       <div v-for="(step, index) in config.checkin.steps" :key="index" class="step-editor">
@@ -119,7 +135,7 @@ const router = useRouter()
 const config = reactive({
   site: { name: '', url: '', type: 'web' },
   login: { method: 'cookie', cookie_file: '' },
-  checkin: { steps: [] },
+  checkin: { steps: [], start_from_step: 0 },
   verify: { success: [], fail: [] },
   schedule: '08:00'
 })
