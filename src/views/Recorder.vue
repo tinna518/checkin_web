@@ -36,11 +36,14 @@
       </template>
       <el-timeline>
         <el-timeline-item v-for="(step, i) in steps" :key="i"
-          :type="step.action === 'click' ? 'primary' : step.action === 'goto_href' ? 'warning' : 'success'">
+          :type="getTimelineType(step)">
           <div class="step-item">
-            <el-tag size="small">{{ getActionLabel(step.action) }}</el-tag>
-            <code class="step-selector">{{ step.selector }}</code>
+            <el-tag size="small" :type="getTagType(step)">{{ getActionLabel(step.action) }}</el-tag>
+            <code class="step-selector" v-if="step.selector">{{ step.selector }}</code>
             <span v-if="step.text" class="step-text">{{ step.text }}</span>
+            <el-tag v-if="step.page_index > 0" size="small" type="info">
+              页面{{ step.page_index + 1 }}
+            </el-tag>
           </div>
         </el-timeline-item>
       </el-timeline>
@@ -153,8 +156,34 @@ const undoLast = () => {
 }
 
 const getActionLabel = (action) => {
-  const map = { click: '点击', goto_href: '跳转', dismiss_popup: '关闭弹窗', wait: '等待', input: '输入' }
+  const map = {
+    click: '点击',
+    goto_href: '跳转',
+    fill: '填写',
+    dismiss_popup: '关闭弹窗',
+    switch_page: '切换页面',
+    wait: '等待',
+    input: '输入'
+  }
   return map[action] || action
+}
+
+const getTimelineType = (step) => {
+  const map = {
+    click: 'primary',
+    goto_href: 'warning',
+    fill: 'primary',
+    dismiss_popup: 'success',
+    switch_page: 'danger',
+    wait: 'info'
+  }
+  return map[step.action] || 'primary'
+}
+
+const getTagType = (step) => {
+  if (step.action === 'switch_page') return 'danger'
+  if (step.action === 'fill') return 'warning'
+  return ''
 }
 
 const saveConfig = async () => {
@@ -166,13 +195,27 @@ const saveConfig = async () => {
       site: { name: form.name, url: form.url, type: 'web' },
       login: { method: 'cookie', cookie_file: cookiePath },
       checkin: {
-        steps: steps.value.map((s, i) => ({
-          name: `步骤${i + 1}: ${s.text || s.action}`.slice(0, 40),
-          action: s.action,
-          selector: s.selector,
-          ...(s.action === 'goto_href' ? { wait: 3 } : {}),
-          ...(s.action === 'click' ? { timeout: 10000 } : {})
-        }))
+        steps: steps.value.map((s, i) => {
+          const base = {
+            name: `步骤${i + 1}: ${s.text || s.action}`.slice(0, 40),
+            action: s.action,
+            selector: s.selector,
+            page_index: s.page_index || 0,
+          }
+          if (s.action === 'goto_href') {
+            base.wait = 3
+          } else if (s.action === 'click') {
+            base.timeout = 10000
+          } else if (s.action === 'fill') {
+            base.value = s.text || ''
+            base.timeout = 5000
+          } else if (s.action === 'switch_page') {
+            base.name = `切换到页面 ${(s.page_index || 0) + 1}`
+            base.page_index = s.page_index || 0
+            delete base.selector
+          }
+          return base
+        })
       },
       verify: { success: ['签到成功', '已签到'], fail: ['请先登录'] }
     }

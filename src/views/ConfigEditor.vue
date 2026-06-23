@@ -39,7 +39,12 @@
       <div v-for="(step, index) in config.checkin.steps" :key="index" class="step-editor">
         <el-card shadow="never">
           <div class="step-header">
-            <span class="step-num">步骤 {{ index + 1 }}: {{ step.name || '未命名' }}</span>
+            <span class="step-num">
+              步骤 {{ index + 1 }}: {{ step.name || '未命名' }}
+              <el-tag v-if="step.page_index > 0" size="small" type="info" style="margin-left:4px;">
+                页面{{ step.page_index + 1 }}
+              </el-tag>
+            </span>
             <div>
               <el-button size="small" :disabled="index === 0" @click="moveStep(index, -1)">上移</el-button>
               <el-button size="small" :disabled="index === config.checkin.steps.length - 1" @click="moveStep(index, 1)">下移</el-button>
@@ -51,7 +56,9 @@
             <el-select v-model="step.action" @change="onActionChange(step)">
               <el-option label="点击元素" value="click" />
               <el-option label="跳转链接(href)" value="goto_href" />
+              <el-option label="填写输入框" value="fill" />
               <el-option label="关闭弹窗" value="dismiss_popup" />
+              <el-option label="切换页面" value="switch_page" />
               <el-option label="等待" value="wait" />
             </el-select>
           </el-form-item>
@@ -60,7 +67,26 @@
             <el-input v-model="step.name" placeholder="步骤描述" />
           </el-form-item>
 
-          <template v-if="step.action === 'dismiss_popup'">
+          <template v-if="step.action === 'switch_page'">
+            <el-form-item label="目标页面">
+              <el-input-number v-model="step.page_index" :min="0" :max="10" />
+              <span style="color:#999;font-size:12px;margin-left:8px;">页面编号（0=主页面，1=第二个标签页...）</span>
+            </el-form-item>
+          </template>
+
+          <template v-else-if="step.action === 'fill'">
+            <el-form-item label="选择器">
+              <el-input v-model="step.selector" placeholder="input[name='username']" />
+            </el-form-item>
+            <el-form-item label="填写内容">
+              <el-input v-model="step.value" placeholder="要填写的文本" />
+            </el-form-item>
+            <el-form-item label="超时(ms)">
+              <el-input-number v-model="step.timeout" :min="1000" :max="30000" :step="1000" />
+            </el-form-item>
+          </template>
+
+          <template v-else-if="step.action === 'dismiss_popup'">
             <el-form-item label="选择器">
               <el-input v-for="(sel, si) in (step.selectors || [])" :key="si"
                 v-model="step.selectors[si]" style="margin-bottom:4px;" placeholder=".close-btn" />
@@ -174,6 +200,12 @@ const onActionChange = (step) => {
   if (step.action === 'dismiss_popup') {
     step.selectors = step.selectors || ['']
     step.timeout = step.timeout || 5000
+  } else if (step.action === 'switch_page') {
+    step.page_index = step.page_index || 1
+    step.name = step.name || `切换到页面 ${(step.page_index || 1) + 1}`
+  } else if (step.action === 'fill') {
+    step.timeout = step.timeout || 5000
+    step.value = step.value || ''
   }
 }
 

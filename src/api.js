@@ -24,7 +24,7 @@ export const startRecording = (url, name) =>
   api.post('/record/start', { url, name }).then(r => r.data)
 
 export const stopRecording = () =>
-  api.post('/record/stop').then(r => r.data)
+  api.post('/record/stop', null, { timeout: 60000 }).then(r => r.data)
 
 export const getRecordingStatus = () =>
   api.get('/record/status').then(r => r.data)
