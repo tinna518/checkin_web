@@ -19,7 +19,6 @@
             placeholder="用户名"
             size="large"
             :prefix-icon="User"
-            show-password
           />
         </el-form-item>
         <el-form-item>
