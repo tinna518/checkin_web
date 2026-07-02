@@ -2,21 +2,36 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-brand">
-        <h1>Tinna</h1>
+        <h1>T.</h1>
         <p class="brand-subtitle">登录你的账号以继续</p>
       </div>
 
       <el-form :model="form" @keyup.enter="handleLogin" class="auth-form">
         <el-form-item>
-          <el-input
+          <!-- <el-input
             v-model="form.username"
             placeholder="用户名"
             size="large"
             :prefix-icon="User"
+          /> -->
+           <el-input
+            v-model="form.username"
+            placeholder="用户名"
+            size="large"
+            :prefix-icon="User"
+            show-password
           />
         </el-form-item>
         <el-form-item>
-          <el-input
+          <!-- <el-input
+            v-model="form.password"
+            type="password"
+            placeholder="密码"
+            size="large"
+            :prefix-icon="Lock"
+            show-password
+          /> -->
+           <el-input
             v-model="form.password"
             type="password"
             placeholder="密码"
@@ -113,8 +128,19 @@ const handleLogin = async () => {
 }
 
 .auth-form :deep(.el-input__wrapper) {
+  background: var(--bg-input) !important;
+  box-shadow: none !important;
   border-radius: var(--radius);
   padding: 4px 12px;
+}
+
+.auth-form :deep(.el-input__wrapper:hover) {
+  background: #efe9c8 !important;
+}
+
+.auth-form :deep(.el-input__wrapper.is-focus) {
+  background: #fff !important;
+  box-shadow: 0 0 0 1.5px var(--dark) !important;
 }
 
 .auth-form :deep(.el-form-item) {

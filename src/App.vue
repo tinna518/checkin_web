@@ -4,9 +4,9 @@
       <el-header class="app-header">
         <div class="header-left">
           <div class="logo-box">
-            <h1>Tinna</h1>
+            <h1>T.</h1>
           </div>
-          <el-menu mode="horizontal" :router="true" :default-active="$route.path" class="main-menu">
+          <el-menu mode="horizontal" :router="true" :default-active="$route.path" class="main-menu" :ellipsis="false">
             <el-menu-item index="/">任务列表</el-menu-item>
             <el-menu-item index="/record">可视化录制</el-menu-item>
             <el-menu-item index="/logs">全局日志</el-menu-item>
@@ -150,6 +150,14 @@ body {
   line-height: 56px;
 }
 
+.el-menu--horizontal .el-menu-item:not(.el-menu-item--more) ~ .el-sub-menu {
+  display: none !important;
+}
+
+.el-menu--horizontal > .el-sub-menu.is-active .el-sub-menu__title {
+  display: none !important;
+}
+
 .app-main {
   padding: 28px 32px;
   min-height: calc(100vh - 56px);
@@ -256,6 +264,28 @@ body {
   color: var(--text-muted);
 }
 
+/* Auth page inputs — forced override */
+.auth-form .el-input__wrapper,
+.auth-form .el-input--large .el-input__wrapper {
+  background: var(--bg-input) !important;
+  box-shadow: none !important;
+  border-radius: var(--radius) !important;
+  padding: 4px 12px !important;
+}
+
+.auth-form .el-input__wrapper:hover,
+.auth-form .el-input--large .el-input__wrapper:hover {
+  background: #efe9c8 !important;
+  box-shadow: none !important;
+}
+
+.auth-form .el-input__wrapper.is-focus,
+.auth-form .el-input--large .el-input__wrapper.is-focus,
+.auth-form .el-input.is-focus .el-input__wrapper {
+  background: #fff !important;
+  box-shadow: 0 0 0 1.5px var(--dark) !important;
+}
+
 .el-textarea__inner {
   background: var(--bg-input) !important;
   box-shadow: none !important;
@@ -277,6 +307,41 @@ body {
 }
 
 /* Select */
+.el-select .el-input__wrapper {
+  background: var(--bg-input) !important;
+  box-shadow: none !important;
+  border-radius: var(--radius);
+}
+
+.el-select .el-input__wrapper:hover {
+  background: #efe9c8 !important;
+}
+
+.el-select .el-input.is-focus .el-input__wrapper,
+.el-select .el-input__wrapper.is-focus {
+  background: #fff !important;
+  box-shadow: 0 0 0 1.5px var(--dark) !important;
+}
+
+.el-select__wrapper {
+  background: var(--bg-input) !important;
+  box-shadow: none !important;
+  border: 1.5px solid transparent !important;
+  border-radius: var(--radius);
+  min-height: 32px;
+}
+
+.el-select__wrapper:hover {
+  background: #efe9c8 !important;
+}
+
+.el-select__wrapper.is-focused,
+.el-select__wrapper.is-filterable.is-focused {
+  background: #fff !important;
+  border-color: var(--dark) !important;
+  box-shadow: none !important;
+}
+
 .el-select-dropdown {
   background: #fff !important;
   border: 1px solid var(--border) !important;

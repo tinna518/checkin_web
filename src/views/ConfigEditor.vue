@@ -2,7 +2,7 @@
   <div class="config-editor">
     <div class="header">
       <h2>编辑配置</h2>
-      <el-button @click="$router.back()">返回</el-button>
+      <el-button class="custBttton" @click="$router.back()">返回</el-button>
     </div>
 
     <div v-if="loading" style="text-align:center;padding:40px;">加载中...</div>
@@ -55,9 +55,9 @@
               </el-tag>
             </span>
             <div @click.stop>
-              <el-button size="small" :disabled="index === 0" @click="moveStep(index, -1)">上移</el-button>
-              <el-button size="small" :disabled="index === config.checkin.steps.length - 1" @click="moveStep(index, 1)">下移</el-button>
-              <el-button size="small" type="danger" text @click="removeStep(index)">删除</el-button>
+              <el-button size="small" class="custBttton" :disabled="index === 0" @click="moveStep(index, -1)">上移</el-button>
+              <el-button size="small" class="custBttton" :disabled="index === config.checkin.steps.length - 1" @click="moveStep(index, 1)">下移</el-button>
+              <el-button size="small"  type="danger" @click="removeStep(index)">删除</el-button>
             </div>
           </div>
 
@@ -418,6 +418,17 @@ const test = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+}
+.custBttton{
+  padding: 6px 16px !important;
+  border: 1.5px solid var(--dark) !important;
+  border-radius: var(--radius) !important;
+  background: transparent !important;
+  color: var(--dark) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 .header h2 {
   margin: 0;

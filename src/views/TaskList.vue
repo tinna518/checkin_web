@@ -23,7 +23,8 @@
         <div class="task-card-header">
           <div class="task-type-badge" :class="getTaskType(task)">
             <el-icon style="margin-right:4px;">
-              <component :is="getTaskType(task) === 'desktop' ? 'Monitor' : 'Link'" />
+              <Monitor v-if="getTaskType(task) === 'desktop'" />
+              <Link v-else />
             </el-icon>
             {{ getTaskType(task) === 'desktop' ? '桌面端' : '网页端' }}
           </div>
@@ -278,15 +279,18 @@ const formatTime = (iso) => {
 }
 
 .header .el-button--primary {
-  background: var(--dark);
-  border-color: var(--dark);
+  background: #fff083;
+  border-color: #fff083;
+  color: var(--dark);
   font-weight: 700;
   border-radius: var(--radius);
   padding: 10px 20px;
 }
 
 .header .el-button--primary:hover {
-  background: #333;
+  background: #ffe95f;
+  border-color: #ffe95f;
+  color: var(--dark);
 }
 
 .task-grid {

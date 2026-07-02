@@ -21,13 +21,13 @@
       <el-form-item v-if="form.type === 'desktop'" label="程序路径">
         <div style="display:flex;gap:8px;width:100%;">
           <el-input v-model="form.processPath" placeholder="选择或输入程序路径（可选，留空则连接已运行的程序）" />
-          <el-button @click="showFileBrowser = true" :disabled="recording">浏览</el-button>
+          <el-button @click="showFileBrowser = true" class="custBttton" :disabled="recording">浏览</el-button>
         </div>
       </el-form-item>
     </el-form>
 
     <div class="recorder-controls">
-      <el-button v-if="!recording" type="primary" :loading="starting"
+      <el-button v-if="!recording" type="primary" :loading="starting" class="start-record-btn"
         :disabled="!form.name || (form.type === 'web' && !form.url)" @click="startRecord">
         开始录制
       </el-button>
@@ -104,7 +104,10 @@
           <el-time-picker v-model="scheduleForm.time" format="HH:mm" value-format="HH:mm" placeholder="选择时间" />
         </el-form-item>
       </el-form>
-      <el-button type="success" :loading="saving" @click="saveConfig">保存任务</el-button>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <el-button type="success" :loading="saving" @click="saveConfig">保存任务</el-button>
+        <el-button @click="router.push('/')">取消</el-button>
+      </div>
     </div>
 
     <!-- 文件浏览弹窗 -->
@@ -437,4 +440,23 @@ const saveConfig = async () => {
 .file-item.is-exe .file-name { color: var(--dark); font-weight: 600; }
 .file-icon { font-size: 18px; flex-shrink: 0; }
 .file-name { font-size: 14px; }
+.custBttton{
+  padding: 6px 16px !important;
+  border: 1.5px solid var(--dark) !important;
+  border-radius: var(--radius) !important;
+  background: transparent !important;
+  color: var(--dark) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+/* 开始录制按钮：禁用时保持黑色底（可点击状态保持 Element Plus 默认蓝色） */
+.start-record-btn.is-disabled,
+.start-record-btn.is-disabled:hover {
+  background-color: var(--dark) !important;
+  border-color: var(--dark) !important;
+  color: #fff !important;
+  opacity: 0.5;
+}
 </style>
