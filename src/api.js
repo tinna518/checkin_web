@@ -6,6 +6,41 @@ const api = axios.create({
 })
 
 // ── 任务管理 ─────────────────────
+
+// Add a request interceptor to inject the token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = 'Bearer ' + token
+  }
+  return config
+})
+
+// Add response interceptor to handle 401
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      if (window.location.pathname !== '/login') {
+         window.location.href = '/login'
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
+export const login = (username, password) => {
+  const formData = new URLSearchParams()
+  formData.append('username', username)
+  formData.append('password', password)
+  return api.post('/login', formData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(r => r.data)
+}
+
+export const register = (username, password) => 
+  api.post('/register', { username, password }).then(r => r.data)
+
 export const getTasks = () => api.get('/tasks').then(r => r.data)
 export const getTask = (id) => api.get(`/tasks/${id}`).then(r => r.data)
 export const createTask = (data) => api.post('/tasks', data).then(r => r.data)

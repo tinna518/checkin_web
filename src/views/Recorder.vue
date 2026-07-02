@@ -414,26 +414,27 @@ const saveConfig = async () => {
 
 <style scoped>
 .recorder { max-width: 800px; margin: 0 auto; }
+.recorder h2 { color: var(--dark); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; }
 .recorder-controls { margin: 20px 0; }
 .steps-card { margin-top: 20px; }
-.step-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.step-selector { color: #409eff; font-size: 13px; background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
-.step-text { color: #666; font-size: 13px; }
-.step-window { color: #999; font-size: 12px; font-style: italic; }
-.start-step-section { margin-top: 20px; padding: 16px; background: #f9f9f9; border-radius: 8px; }
-.save-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; }
+.step-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text); }
+.step-selector { color: var(--dark); font-size: 13px; background: var(--bg-hover); padding: 2px 6px; border-radius: 3px; font-weight: 600; }
+.step-text { color: var(--text-secondary); font-size: 13px; }
+.step-window { color: var(--text-muted); font-size: 12px; font-style: italic; }
+.start-step-section { margin-top: 20px; padding: 16px; background: var(--bg-hover); border-radius: var(--radius); }
+.save-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
 
 /* 文件浏览器 */
 .file-browser { min-height: 300px; }
-.browser-path { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; flex-wrap: wrap; }
-.current-path { color: #666; font-size: 13px; word-break: break-all; flex: 1; min-width: 100px; }
-.drive-list { display: flex; gap: 6px; margin-bottom: 12px; padding: 8px 10px; background: #f5f7fa; border-radius: 6px; align-items: center; flex-wrap: wrap; }
-.drive-label { color: #909399; font-size: 12px; margin-right: 4px; }
+.browser-path { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.current-path { color: var(--text-secondary); font-size: 13px; word-break: break-all; flex: 1; min-width: 100px; }
+.drive-list { display: flex; gap: 6px; margin-bottom: 12px; padding: 8px 10px; background: var(--bg-hover); border-radius: 6px; align-items: center; flex-wrap: wrap; }
+.drive-label { color: var(--text-muted); font-size: 12px; margin-right: 4px; }
 .file-list { max-height: 350px; overflow-y: auto; }
-.file-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-.file-item:hover { background: #f5f7fa; }
+.file-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; color: var(--text); }
+.file-item:hover { background: var(--bg-hover); }
 .file-item.is-dir .file-name { font-weight: 500; }
-.file-item.is-exe .file-name { color: #409eff; }
+.file-item.is-exe .file-name { color: var(--dark); font-weight: 600; }
 .file-icon { font-size: 18px; flex-shrink: 0; }
 .file-name { font-size: 14px; }
 </style>

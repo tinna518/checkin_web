@@ -59,5 +59,6 @@ const loadLogs = async () => {
 <style scoped>
 .logs { max-width: 1000px; margin: 0 auto; }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header h2 { color: var(--dark); margin: 0; font-weight: 800; font-size: 28px; letter-spacing: -0.5px; }
 .filters { display: flex; gap: 12px; }
 </style>

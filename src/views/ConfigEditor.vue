@@ -421,6 +421,10 @@ const test = async () => {
 }
 .header h2 {
   margin: 0;
+  color: var(--dark);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.5px;
 }
 .step-editor {
   margin-bottom: 16px;
@@ -432,7 +436,8 @@ const test = async () => {
   margin-bottom: 12px;
 }
 .step-num {
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--text);
 }
 .tag-input {
   display: flex;
@@ -443,13 +448,12 @@ const test = async () => {
 .actions {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #ebeef5;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
-/* 优化表单留白 */
 :deep(.el-form-item) {
   margin-bottom: 18px;
 }
@@ -460,34 +464,31 @@ const test = async () => {
   padding: 16px 20px;
 }
 
-/* 强调样式与横线美化 */
 .custom-divider {
   margin: 40px 0 24px;
 }
 :deep(.custom-divider .el-divider__text) {
   font-size: 16px;
-  font-weight: bold;
-  color: #409EFF;
+  font-weight: 800;
+  color: var(--dark);
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #f0f2f5; 
-  /* 如果你的整体页面背景色是白色，这里可能需要改成 white。 */
 }
 
 .highlight-item {
-  background: #fdf6ec; /* 温和的橙色提醒底色 */
+  background: #fff8e1;
   padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #faecd8;
+  border-radius: var(--radius);
+  border: 1px solid #ffecb3;
 }
 :deep(.highlight-item .el-form-item__label) {
-  font-weight: bold;
-  color: #e6a23c;
+  font-weight: 700;
+  color: var(--warning);
 }
 
 :deep(.custom-collapse .el-collapse-item__header) {
-  background: #fafafa;
+  background: var(--bg-hover);
   border-bottom: none;
   padding: 0 16px;
   border-radius: 4px;

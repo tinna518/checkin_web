@@ -46,10 +46,32 @@
         <div class="task-card-info">
           <div class="info-item">
             <div class="info-label">定时</div>
-            <div class="info-value">
-              <el-icon style="margin-right:2px;"><Clock /></el-icon>
-              {{ task.schedule || '08:00' }}
-            </div>
+            <el-popover
+              :visible="schedulePopoverVisible === task.id"
+              placement="bottom"
+              :width="220"
+              trigger="manual"
+              popper-class="schedule-popover"
+            >
+              <template #reference>
+                <div class="info-value schedule-clickable" @click.stop="openSchedulePopover(task)">
+                  <el-icon style="margin-right:2px;"><Clock /></el-icon>
+                  {{ task.schedule || '08:00' }}
+                  <el-icon class="schedule-edit-hint"><Edit /></el-icon>
+                </div>
+              </template>
+              <template #default>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                  <el-time-picker
+                    v-model="tempScheduleTime"
+                    format="HH:mm"
+                    placeholder="选择时间"
+                    style="width:100%;"
+                  />
+                  <el-button type="primary" size="small" @click="saveSchedule(task)">确认修改</el-button>
+                </div>
+              </template>
+            </el-popover>
           </div>
           <div class="info-divider"></div>
           <div class="info-item">
@@ -110,7 +132,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Loading, Plus, Monitor, Link, Clock, CircleCheck, CircleClose,
-  Edit, VideoPlay, VideoPause, MoreFilled, Document, Delete
+  Edit, VideoPlay, VideoPause, MoreFilled, Document, Delete, Check
 } from '@element-plus/icons-vue'
 import { getTasks, runTask, updateTask, deleteTask } from '../api'
 
@@ -118,6 +140,8 @@ const router = useRouter()
 const tasks = ref([])
 const loading = ref(true)
 const runningId = ref(null)
+const schedulePopoverVisible = ref(null)
+const tempScheduleTime = ref(null)
 
 onMounted(async () => {
   await loadTasks()
@@ -180,6 +204,33 @@ const handleCommand = async (cmd, task) => {
   }
 }
 
+const openSchedulePopover = (task) => {
+  const [h, m] = (task.schedule || '08:00').split(':').map(Number)
+  const d = new Date()
+  d.setHours(h, m, 0, 0)
+  tempScheduleTime.value = d
+  schedulePopoverVisible.value = task.id
+}
+
+const saveSchedule = async (task) => {
+  const val = tempScheduleTime.value
+  let schedule
+  if (val instanceof Date) {
+    schedule = `${String(val.getHours()).padStart(2, '0')}:${String(val.getMinutes()).padStart(2, '0')}`
+  } else {
+    schedule = String(val)
+  }
+  try {
+    await updateTask(task.id, { schedule })
+    ElMessage.success(`定时已更新为 ${schedule}`)
+    schedulePopoverVisible.value = null
+    await loadTasks()
+  } catch (e) {
+    console.error('[saveSchedule] 更新失败:', e?.response?.status, e?.response?.data || e?.message || e)
+    ElMessage.error('更新失败: ' + (e?.response?.data?.detail || e?.message || '未知错误'))
+  }
+}
+
 const getTaskType = (task) => {
   return task.config?.site?.type || 'web'
 }
@@ -215,53 +266,56 @@ const formatTime = (iso) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .header h2 {
-  font-size: 24px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dark);
   margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.header .el-button--primary {
+  background: var(--dark);
+  border-color: var(--dark);
+  font-weight: 700;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+}
+
+.header .el-button--primary:hover {
+  background: #333;
 }
 
 .task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 20px;
 }
 
 /* ============ 卡片主体 ============ */
 .task-card {
   position: relative;
   height: 240px;
-  border-radius: 14px;
-  background: #ffffff;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   overflow: hidden;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
 }
 
 .task-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 8px 16px rgba(102, 126, 234, 0.12),
-    0 16px 32px rgba(102, 126, 234, 0.08);
-  border-color: rgba(102, 126, 234, 0.3);
+  border-color: var(--dark);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
 .task-card.disabled {
-  opacity: 0.65;
-  filter: grayscale(0.3);
+  opacity: 0.5;
 }
 
 /* 顶部装饰条 */
@@ -270,12 +324,12 @@ const formatTime = (iso) => {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  height: 3px;
+  background: var(--dark);
 }
 
 .task-card-strip.desktop {
-  background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+  background: var(--warning);
 }
 
 /* ============ 头部 ============ */
@@ -289,17 +343,19 @@ const formatTime = (iso) => {
 .task-type-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 3px 10px;
+  border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
-  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  color: #4f46e5;
+  background: var(--bg-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .task-type-badge.desktop {
-  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  color: #be185d;
+  background: #fff3e0;
+  color: var(--warning);
+  border-color: #ffe0b2;
 }
 
 .task-status-dot {
@@ -308,41 +364,35 @@ const formatTime = (iso) => {
   gap: 6px;
   font-size: 12px;
   font-weight: 500;
-  color: #909399;
+  color: var(--text-muted);
 }
 
 .task-status-dot .dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #c0c4cc;
+  background: #ccc;
   position: relative;
 }
 
 .task-status-dot.on {
-  color: #67c23a;
+  color: var(--success);
 }
 
 .task-status-dot.on .dot {
-  background: #67c23a;
-  box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.6);
+  background: var(--success);
+  box-shadow: 0 0 0 0 rgba(45, 138, 78, 0.4);
   animation: pulse 2s infinite;
 }
 
 .task-status-dot.off {
-  color: #909399;
+  color: var(--text-muted);
 }
 
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(103, 194, 58, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(103, 194, 58, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(45, 138, 78, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(45, 138, 78, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 138, 78, 0); }
 }
 
 /* ============ 主体 ============ */
@@ -358,21 +408,20 @@ const formatTime = (iso) => {
 .task-name {
   font-size: 18px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--dark);
   line-height: 1.4;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-bottom: 6px;
-  letter-spacing: -0.2px;
 }
 
 .task-target {
   display: flex;
   align-items: center;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -386,8 +435,8 @@ const formatTime = (iso) => {
   align-items: center;
   margin: 0 20px;
   padding: 12px 0;
-  border-top: 1px dashed #e5e7eb;
-  border-bottom: 1px dashed #e5e7eb;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .info-item {
@@ -399,10 +448,10 @@ const formatTime = (iso) => {
 
 .info-label {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .info-value {
@@ -410,21 +459,45 @@ const formatTime = (iso) => {
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .info-value.success {
-  color: #67c23a;
+  color: var(--success);
 }
 
 .info-value.failed {
-  color: #f56c6c;
+  color: var(--danger);
+}
+
+.schedule-clickable {
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.schedule-clickable:hover {
+  background: var(--bg-hover);
+  color: var(--dark);
+}
+
+.schedule-edit-hint {
+  margin-left: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: var(--text-muted);
+}
+
+.schedule-clickable:hover .schedule-edit-hint {
+  opacity: 1;
 }
 
 .info-divider {
   width: 1px;
   height: 24px;
-  background: #e5e7eb;
+  background: var(--border);
   margin: 0 12px;
 }
 
@@ -433,7 +506,8 @@ const formatTime = (iso) => {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #fafbfc;
+  background: rgba(245, 240, 214, 0.3);
+  border-top: 1px solid var(--border-light);
   gap: 4px;
 }
 
@@ -444,36 +518,36 @@ const formatTime = (iso) => {
   justify-content: center;
   gap: 4px;
   padding: 8px 4px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   user-select: none;
 }
 
 .action-btn:hover {
-  background: rgba(102, 126, 234, 0.08);
-  color: #667eea;
+  background: var(--dark);
+  color: #fff;
 }
 
 .action-btn.edit:hover {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: var(--dark);
+  color: #fff;
 }
 
 .action-btn.run {
-  color: #67c23a;
+  color: var(--success);
 }
 
 .action-btn.run:hover {
-  background: rgba(103, 194, 58, 0.1);
-  color: #67c23a;
+  background: var(--success);
+  color: #fff;
 }
 
 .action-btn.run.loading {
-  color: #e6a23c;
+  color: var(--warning);
   pointer-events: none;
 }
 
